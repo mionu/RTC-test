@@ -1,2 +1,3 @@
 export * from './api.models.js';
-export * from './mapping.models.js';
+export * from './common.models';
+export * from './sport-event.models';

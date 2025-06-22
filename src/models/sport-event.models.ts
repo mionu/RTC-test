@@ -1,4 +1,5 @@
 import { CompetitorType, EventStatus, ScoreType, Sport } from '../enums';
+import { Nullable } from './common.models';
 
 export type Id = string;
 
@@ -19,9 +20,16 @@ export interface Competitor {
 export interface SportEvent {
     id: Id;
     status: EventStatus;
-    scores: Record<ScoreType, Score> | null;
+    scores: Nullable<Partial<Record<ScoreType, Score>>>;
     startTime: string;
     sport: Sport;
     competitors: { [type in CompetitorType]: Competitor };
     competition: string;
+}
+
+export interface EventChange {
+    id: Id;
+    type: string;
+    oldValue: Nullable<string>;
+    newValue: string;
 }

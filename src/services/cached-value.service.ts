@@ -1,17 +1,34 @@
+import { Nullable } from '../models';
+
 type UpdateFunction<T> = () => Promise<T>;
 type Cached<T> = {
     data: T;
     expiresAt: number;
 };
 
+/**
+ * Generic cache wrapper for asynchronously fetched values with TTL.
+ */
 export class CachedValue<T> {
-    private value: Cached<T> | null = null;
-    private activePromise: Promise<T> | null = null;
+    private value: Nullable<Cached<T>> = null;
+    private activePromise: Nullable<Promise<T>> = null;
 
-    constructor(private readonly updateFunction: UpdateFunction<T>, private readonly ttlMs: number) {}
+    /**
+     * @param updateFunction Function to fetch the value.
+     * @param ttlMs Time-to-live for the cached value in milliseconds.
+     */
+    constructor(
+        private readonly updateFunction: UpdateFunction<T>,
+        private readonly ttlMs: number
+    ) {}
 
-    public async getValue(): Promise<T> {
-        if (this.value?.data && this.value?.expiresAt < Date.now()) {
+    /**
+     * Gets the cached value, updating it if expired or forced.
+     * @param {boolean} force - If true, forces a refresh.
+     * @returns {Promise<T>} The cached or freshly fetched value.
+     */
+    public async getValue(force = false): Promise<T> {
+        if (!force && this.value?.data && this.value?.expiresAt > Date.now()) {
             return this.value.data;
         }
 
